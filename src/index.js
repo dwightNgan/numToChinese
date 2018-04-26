@@ -1,11 +1,17 @@
 export default class numToChinese {
   constructor(){
-    this.char = ['零','一','二','三','四','五','六','七','八','九','十'];
-    this.baseUnits = ['','十','百','千'];
-    this.quaUnits = ['','万','亿','万亿'];
+    this.lowerChar = ['零','一','二','三','四','五','六','七','八','九'];
+    this.upperChar = ['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'];
+    this.lowerBaseUnits = ['','十','百','千'];
+    this.upperBaseUnits = ['','拾','佰','仟'];
+    this.lowerQuaUnits = ['','万','亿','万亿'];
+    this.upperQuaUnits = ['','萬','億','萬億'];
   }
-  parseInt (number) {
-    const { char, baseUnits, quaUnits } = this;
+  parseInt (number, uppercase) {
+    const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
+    const char = uppercase ? upperChar : lowerChar;
+    const baseUnits = uppercase ? upperBaseUnits : lowerBaseUnits;
+    const quaUnits = uppercase ? upperQuaUnits : lowerQuaUnits;
     const numArr = number.toString().split('').reverse();
     const { length } = numArr;
     
@@ -35,8 +41,9 @@ export default class numToChinese {
 
     return result
   }
-  parseFloat(number){
-    const { char } = this;
+  parseFloat(number, uppercase){
+    const { upperChar, lowerChar } = this;
+    const char = uppercase ? upperChar : lowerChar;
     let charArr = number.toString().split('.');
     let floatStr = charArr[1].split('').map(num => char[num]).join('');
     return this.parseInt(Number(charArr[0])) + '点' + floatStr;
@@ -44,5 +51,5 @@ export default class numToChinese {
 
 }
 
-// console.log(new numToChinese().parseInt(1000007000000001));
-console.log(new numToChinese().parseFloat(10.000001));
+console.log(new numToChinese().parseInt(1000007000000001, true));
+// console.log(new numToChinese().parseFloat(10.000001));
