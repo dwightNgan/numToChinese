@@ -7,8 +7,9 @@ export default class numToChinese {
     this.lowerQuaUnits = ['','万','亿','万亿'];
     this.upperQuaUnits = ['','萬','億','萬億'];
   }
-  parseInt (number, uppercase = false) {
+  parseInt (number, options = {}) {
     const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
+    const { uppercase = false, tenWithoutOne } = options;
     const char = uppercase ? upperChar : lowerChar;
     const baseUnits = uppercase ? upperBaseUnits : lowerBaseUnits;
     const quaUnits = uppercase ? upperQuaUnits : lowerQuaUnits;
@@ -48,10 +49,17 @@ export default class numToChinese {
       })
     })
 
-    return result.replace(/零+$/,'')
+    result = result.replace(/零+$/,'');
+
+    if(tenWithoutOne && numArr.length === 2){
+      result = result.replace(/^一/, '')
+    }
+
+    return result
   }
-  parseFloat(number, uppercase = false){
+  parseFloat(number, options){
     const { upperChar, lowerChar } = this;
+    const { uppercase = false } = options;    
     const char = uppercase ? upperChar : lowerChar;
     let charArr = number.toString().split('.');
     let floatStr = charArr[1].split('').map(num => char[num]).join('');
@@ -60,5 +68,5 @@ export default class numToChinese {
 
 }
 
-console.log(new numToChinese().parseInt(100000100000));
+console.log(new numToChinese().parseInt(110,{tenWithoutOne: true}));
 // console.log(new numToChinese().parseFloat(10.000001));
