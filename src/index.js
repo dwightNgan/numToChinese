@@ -7,7 +7,7 @@ export default class numToChinese {
     this.lowerQuaUnits = ['','万','亿','万亿'];
     this.upperQuaUnits = ['','萬','億','萬億'];
   }
-  parseInt (number, uppercase) {
+  parseInt (number, uppercase = false) {
     const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
     const char = uppercase ? upperChar : lowerChar;
     const baseUnits = uppercase ? upperBaseUnits : lowerBaseUnits;
@@ -39,9 +39,18 @@ export default class numToChinese {
       return groupStr ? groupStr + quaUnits[index] : '';
     }).reverse().join('');
 
-    return result
+    quaUnits.forEach(quaUnit => {
+      if(!quaUnit) return;
+      baseUnits.forEach(baseUnit => {
+        if(!baseUnit) return
+        let regEx = RegExp(`${baseUnit}${quaUnit}零?`);
+        result = result.replace(regEx, `${baseUnit}${quaUnit}零`)
+      })
+    })
+
+    return result.replace(/零+$/,'')
   }
-  parseFloat(number, uppercase){
+  parseFloat(number, uppercase = false){
     const { upperChar, lowerChar } = this;
     const char = uppercase ? upperChar : lowerChar;
     let charArr = number.toString().split('.');
@@ -51,5 +60,5 @@ export default class numToChinese {
 
 }
 
-console.log(new numToChinese().parseInt(1000007000000001, true));
+console.log(new numToChinese().parseInt(100000100000));
 // console.log(new numToChinese().parseFloat(10.000001));
