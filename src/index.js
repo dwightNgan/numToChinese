@@ -9,7 +9,7 @@ export default class numToChinese {
   }
   parseInt (number, options = {}) {
     const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
-    const { uppercase = false, tenWithoutOne } = options;
+    const { uppercase = false, tenWithoutOne, twenty, thirty, forty } = options;
     const char = uppercase ? upperChar : lowerChar;
     const baseUnits = uppercase ? upperBaseUnits : lowerBaseUnits;
     const quaUnits = uppercase ? upperQuaUnits : lowerQuaUnits;
@@ -55,6 +55,18 @@ export default class numToChinese {
       result = result.replace(/^一/, '')
     }
 
+    if(twenty && numArr.length === 2){
+      result = result.replace(/^二十/, '廿')
+    }
+
+    if(thirty && numArr.length === 2){
+      result = result.replace(/^三十/, '卅')
+    }
+
+    if(forty && numArr.length === 2){
+      result = result.replace(/^四十/, '卌')
+    }
+
     return result
   }
   parseFloat(number, options){
@@ -68,5 +80,5 @@ export default class numToChinese {
 
 }
 
-console.log(new numToChinese().parseInt(110,{tenWithoutOne: true}));
+console.log(new numToChinese().parseInt(24,{twenty:true}));
 // console.log(new numToChinese().parseFloat(10.000001));
