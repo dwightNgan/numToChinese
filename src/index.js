@@ -9,7 +9,8 @@ export default class numToChinese {
   }
   parseInt (number, options = {}) {
     const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
-    const { uppercase = false, tenWithoutOne, twenty, thirty, forty } = options;
+    const { uppercase = false, alias = {} } = options;
+    const {tenWithoutOne, twenty, thirty, forty} = alias;
     const char = uppercase ? upperChar : lowerChar;
     const baseUnits = uppercase ? upperBaseUnits : lowerBaseUnits;
     const quaUnits = uppercase ? upperQuaUnits : lowerQuaUnits;
@@ -51,8 +52,8 @@ export default class numToChinese {
 
     result = result.replace(/零+$/,'');
 
-    if(tenWithoutOne && numArr.length === 2){
-      result = result.replace(/^一/, '')
+    if(tenWithoutOne){
+      result = result.replace(/^一十/, '十')
     }
 
     if(twenty && numArr.length === 2){
@@ -67,18 +68,44 @@ export default class numToChinese {
       result = result.replace(/^四十/, '卌')
     }
 
-    return result
+    return result || '零'
   }
   parseFloat(number, options){
     const { upperChar, lowerChar } = this;
     const { uppercase = false } = options;    
     const char = uppercase ? upperChar : lowerChar;
     let charArr = number.toString().split('.');
-    let floatStr = charArr[1].split('').map(num => char[num]).join('');
-    return this.parseInt(Number(charArr[0])) + '点' + floatStr;
+    let floatStr = processString(charArr[1], num => char[num]);
+    return this.parseInt(Number(charArr[0]), options) + '点' + floatStr;
   }
 
+  parseDate(dateStr){
+    const date = new Date(dateStr);
+    if(date === 'Invalid Date'){
+      return 'Invalid Date'
+    }
+    const { lowerChar } = this;
+    const char = lowerChar;
+    let genChar = num => this.parseInt(num, {alias: {tenWithoutOne: true}});
+    let result = '';
+    result += processString(date.getFullYear(), num => char[num]) + '年';
+    result += genChar(date.getMonth() + 1) + '月';
+    result += genChar(date.getDate()) + '日 ';
+    result += genChar(date.getHours()) + '时';
+    result += genChar(date.getMinutes()) + '分';
+    result += genChar(date.getSeconds()) + '秒';
+    return result;
+  }
 }
 
-console.log(new numToChinese().parseInt(24,{twenty:true}));
+console.log(new numToChinese().parseInt(0));
+console.log(new numToChinese().parseInt(1000024,{uppercase:true}));
+console.log(new numToChinese().parseDate([1999,5,23]));
 // console.log(new numToChinese().parseFloat(10.000001));
+
+function processString( stringOrNumber , process ) {
+  if(typeof stringOrNumber === 'number'){
+    stringOrNumber = stringOrNumber.toString();
+  }
+  return stringOrNumber.split('').map(process).join('')
+}
