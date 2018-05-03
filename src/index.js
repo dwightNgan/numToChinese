@@ -1,3 +1,5 @@
+import { format } from "util";
+
 export default class numToChinese {
   constructor(){
     this.lowerChar = ['零','一','二','三','四','五','六','七','八','九'];
@@ -79,7 +81,7 @@ export default class numToChinese {
     return this.parseInt(Number(charArr[0]), options) + '点' + floatStr;
   }
 
-  parseDate(dateStr){
+  parseDate(dateStr, format){
     const date = new Date(dateStr);
     if(date === 'Invalid Date'){
       return 'Invalid Date'
@@ -87,20 +89,28 @@ export default class numToChinese {
     const { lowerChar } = this;
     const char = lowerChar;
     let genChar = num => this.parseInt(num, {alias: {tenWithoutOne: true}});
-    let result = '';
-    result += processString(date.getFullYear(), num => char[num]) + '年';
-    result += genChar(date.getMonth() + 1) + '月';
-    result += genChar(date.getDate()) + '日 ';
-    result += genChar(date.getHours()) + '时';
-    result += genChar(date.getMinutes()) + '分';
-    result += genChar(date.getSeconds()) + '秒';
-    return result;
+    let result = format;
+    let charObj = {
+      y: processString(date.getFullYear(), num => char[num]) + '年',
+      M: genChar(date.getMonth() + 1) + '月',
+      d: genChar(date.getDate()) + '日',
+      h: genChar(date.getHours()) + '时',
+      m: genChar(date.getMinutes()) + '分',
+      s: genChar(date.getSeconds()) + '秒',
+      D: '星期' + processString(date.getDay(), num => num === '0' ? '日' : char[num]),
+      a: date.getHours() > 11 ? '下午' : '上午'
+    }
+    Object.keys(charObj).forEach(key => {
+      result = result.replace(RegExp(`${key}+`), charObj[key]);
+    })
+
+    return result.replace(/[-|:]/g,'');
   }
 }
 
 console.log(new numToChinese().parseInt(0));
 console.log(new numToChinese().parseInt(1000024,{uppercase:true}));
-console.log(new numToChinese().parseDate([1999,5,23]));
+console.log(new numToChinese().parseDate([1999,5,23], 'yyyy-MM-dd hh:mm:ss D a'));
 // console.log(new numToChinese().parseFloat(10.000001));
 
 function processString( stringOrNumber , process ) {
