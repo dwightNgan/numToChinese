@@ -10,9 +10,13 @@ export default class numToChinese {
     this.upperQuaUnits = ['','萬','億','萬億'];
   }
   parseInt (number, options = {}) {
+    if(isNaN(Number(number))){
+      return 'Invalid Number'
+    }
+    number = typeof number === 'string' ? number: number.toString();
     const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
     const { uppercase = false, alias = {} } = options;
-    const {tenWithoutOne, twenty, thirty, forty} = alias;
+    const { tenWithoutOne, twenty, thirty, forty } = alias;
     const char = uppercase ? upperChar : lowerChar;
     const baseUnits = uppercase ? upperBaseUnits : lowerBaseUnits;
     const quaUnits = uppercase ? upperQuaUnits : lowerQuaUnits;
@@ -88,7 +92,9 @@ export default class numToChinese {
     }
     const { lowerChar } = this;
     const char = lowerChar;
-    let genChar = num => this.parseInt(num, {alias: {tenWithoutOne: true}});
+    let genChar = num => (
+      this.parseInt(num < 10 ? `0${num}` : num, {alias: {tenWithoutOne: true}})
+    );
     let result = format;
     let charObj = {
       y: processString(date.getFullYear(), num => char[num]) + '年',
@@ -108,9 +114,9 @@ export default class numToChinese {
   }
 }
 
-console.log(new numToChinese().parseInt(0));
+console.log(new numToChinese().parseInt(100));
 console.log(new numToChinese().parseInt(1000024,{uppercase:true}));
-console.log(new numToChinese().parseDate([1999,5,23], 'yyyy-MM-dd hh:mm:ss D a'));
+console.log(new numToChinese().parseDate('2018-05-03 12:09:11', 'yyyy-MM-dd hh:mm:ss D a'));
 // console.log(new numToChinese().parseFloat(10.000001));
 
 function processString( stringOrNumber , process ) {
