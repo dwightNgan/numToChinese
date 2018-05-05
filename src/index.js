@@ -13,15 +13,19 @@ export default class numToChinese {
     if(isNaN(Number(number))){
       return 'Invalid Number'
     }
-    number = typeof number === 'string' ? number: number.toString();
+    number = Number(number).toString()
     const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
     const { uppercase = false, alias = {} } = options;
-    const { tenWithoutOne, twenty, thirty, forty } = alias;
+    const { tenWithoutOne, twenty, thirty, forty, digitWithZero } = alias;
     const char = uppercase ? upperChar : lowerChar;
     const baseUnits = uppercase ? upperBaseUnits : lowerBaseUnits;
     const quaUnits = uppercase ? upperQuaUnits : lowerQuaUnits;
     const numArr = number.toString().split('').reverse();
     const { length } = numArr;
+
+    if(length === 1){
+      return (digitWithZero ? '零' : '' ) + char[number] 
+    }
     
     let sliceArr = [];
     numArr.forEach((num, index) => {
@@ -93,7 +97,7 @@ export default class numToChinese {
     const { lowerChar } = this;
     const char = lowerChar;
     let genChar = num => (
-      this.parseInt(num < 10 ? `0${num}` : num, {alias: {tenWithoutOne: true}})
+      this.parseInt(num < 10 ? `0${num}` : num, {alias: {tenWithoutOne: true, digitWithZero: true}})
     );
     let result = format;
     let charObj = {
@@ -114,8 +118,8 @@ export default class numToChinese {
   }
 }
 
-console.log(new numToChinese().parseInt(100));
-console.log(new numToChinese().parseInt(1000024,{uppercase:true}));
+console.log(new numToChinese().parseInt('01', {alias: {digitWithZero: true}}));
+// console.log(new numToChinese().parseInt(1000024,{uppercase:true}));
 console.log(new numToChinese().parseDate('2018-05-03 12:09:11', 'yyyy-MM-dd hh:mm:ss D a'));
 // console.log(new numToChinese().parseFloat(10.000001));
 
