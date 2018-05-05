@@ -13,7 +13,8 @@ export default class numToChinese {
     if(isNaN(Number(number))){
       return 'Invalid Number'
     }
-    number = Number(number).toString()
+    let isNagetive = number < 0;
+    number = Number(number).toString().replace('-', '');
     const { lowerChar, upperChar, lowerBaseUnits, upperBaseUnits, lowerQuaUnits, upperQuaUnits } = this;
     const { uppercase = false, alias = {} } = options;
     const { tenWithoutOne, twenty, thirty, forty, digitWithZero } = alias;
@@ -23,7 +24,7 @@ export default class numToChinese {
     const numArr = number.toString().split('').reverse();
     const { length } = numArr;
 
-    if(length === 1){
+    if(length === 1 && !isNagetive){
       return (digitWithZero ? '零' : '' ) + char[number] 
     }
     
@@ -78,7 +79,7 @@ export default class numToChinese {
       result = result.replace(/^四十/, '卌')
     }
 
-    return result || '零'
+    return (isNagetive ? '负' : '') + (result || '零')
   }
   parseFloat(number, options){
     const { upperChar, lowerChar } = this;
@@ -118,7 +119,7 @@ export default class numToChinese {
   }
 }
 
-console.log(new numToChinese().parseInt('01', {alias: {digitWithZero: true}}));
+console.log(new numToChinese().parseInt('-1093424', {alias: {digitWithZero: true}}));
 // console.log(new numToChinese().parseInt(1000024,{uppercase:true}));
 console.log(new numToChinese().parseDate('2018-05-03 12:09:11', 'yyyy-MM-dd hh:mm:ss D a'));
 // console.log(new numToChinese().parseFloat(10.000001));
