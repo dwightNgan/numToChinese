@@ -81,7 +81,7 @@ export default class numToChinese {
 
     return (isNagetive ? '负' : '') + (result || '零')
   }
-  parseFloat(number, options){
+  parseFloat(number, options = {}){
     const { upperChar, lowerChar } = this;
     const { uppercase = false } = options;    
     const char = uppercase ? upperChar : lowerChar;
@@ -89,8 +89,7 @@ export default class numToChinese {
     let floatStr = processString(charArr[1], num => char[num]);
     return this.parseInt(Number(charArr[0]), options) + '点' + floatStr;
   }
-
-  parseDate(dateStr, format){
+  parseDate(dateStr, format = 'yyyy-MM-dd hh:mm:ss D a'){
     const date = new Date(dateStr);
     if(date === 'Invalid Date'){
       return 'Invalid Date'
@@ -117,12 +116,25 @@ export default class numToChinese {
 
     return result.replace(/[-|:]/g,'');
   }
+  currency(money, options = {}){
+    money = money.toFixed(2).split('.');
+    let { lowerChar, upperChar } = this;
+    let { curUnits = ['元','角','分'], uppercase = false } = options;
+    let char  = uppercase ? upperChar : lowerChar;
+    let integer = this.parseInt(money[0], options) + curUnits[0];
+    let process = (num, index) => char[num] + curUnits[index + 1];
+    let decimal = curUnits.length === 3
+      ? processString(money[1], process)
+      : this.parseInt(money[1], options) + curUnits[1];
+    return  integer + decimal
+  }
 }
 
-console.log(new numToChinese().parseInt('-1093424', {alias: {digitWithZero: true}}));
+// console.log(new numToChinese().parseInt('-1093424', {alias: {digitWithZero: true}}));
 // console.log(new numToChinese().parseInt(1000024,{uppercase:true}));
-console.log(new numToChinese().parseDate('2018-05-03 12:09:11', 'yyyy-MM-dd hh:mm:ss D a'));
+// console.log(new numToChinese().parseDate('2018-05-03 12:09:11'));
 // console.log(new numToChinese().parseFloat(10.000001));
+console.log(new numToChinese().currency(300, {uppercase: true}));
 
 function processString( stringOrNumber , process ) {
   if(typeof stringOrNumber === 'number'){
